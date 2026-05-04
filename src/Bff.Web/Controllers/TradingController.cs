@@ -1,27 +1,27 @@
-using Bff.Application.Features.Pnl.Queries;
-using Bff.Application.Features.Positions.Queries;
-using Bff.Application.Features.Trades.Queries;
+using Bff.Domain.Abstractions;
+using Bff.Domain.Models.ThirdParty;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Bff.Web.Controllers;
 
-public class TradingController : ApiControllerBase
+[ApiController]
+[Route("api/trading")]
+public class TradingController(IThirdPartyService thirdParty) : ControllerBase
 {
-    [HttpGet("pnl")]
-    public async Task<IActionResult> GetPnl([FromQuery] string? quoteAsset)
-    {
-        return Ok(await Mediator.Send(new GetPnlSummaryQuery(quoteAsset)));
-    }
+    [HttpPost("order/buy")]
+    public async Task<IActionResult> PlaceMarketBuy([FromBody] PlaceMarketBuyRequest request, CancellationToken ct)
+        => Ok(await thirdParty.PlaceMarketBuyAsync(request, ct));
 
-    [HttpGet("positions")]
-    public async Task<IActionResult> GetPositions()
+    [HttpPost("order/sell")]
+    public async Task<IActionResult> PlaceMarketSell([FromBody] PlaceMarketSellRequest request, CancellationToken ct)
     {
-        return Ok(await Mediator.Send(new GetOpenPositionsQuery()));
-    }
-
-    [HttpGet("trades")]
-    public async Task<IActionResult> GetTrades([FromQuery] int limit = 5)
-    {
-        return Ok(await Mediator.Send(new GetLastTradesQuery(limit)));
+        try
+        {
+            return Ok(await thirdParty.PlaceMarketSellAsync(request, ct));
+        }
+        catch (HttpRequestException ex) when (ex.Message.StartsWith("Binance order failed"))
+        {
+            return BadRequest(ex.Message);
+        }
     }
 }
