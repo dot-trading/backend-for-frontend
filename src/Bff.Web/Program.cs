@@ -13,5 +13,6 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 
 app.MapControllers();
+app.MapGet("/api/Status", () => Results.Ok("Healthy"));
 
 app.Run();
