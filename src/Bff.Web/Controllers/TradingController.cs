@@ -24,4 +24,7 @@ public class TradingController(IThirdPartyService thirdParty) : ControllerBase
             return BadRequest(ex.Message);
         }
     }
+
+    [HttpGet("pnl")]
+    public IActionResult TestPnl() => Ok(new { Daily = 1.0, Weekly = 2.0, Monthly = 3.0, Total = 4.0 });
 }

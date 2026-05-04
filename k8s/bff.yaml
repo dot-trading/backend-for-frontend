@@ -33,6 +33,16 @@ spec:
         env:
         - name: ASPNETCORE_ENVIRONMENT
           value: "Production"
+        - name: Persistence__BaseUrl
+          valueFrom:
+            configMapKeyRef:
+              name: service-endpoints
+              key: PERSISTENCE_SERVICE_URL
+        - name: ThirdParty__BaseUrl
+          valueFrom:
+            configMapKeyRef:
+              name: service-endpoints
+              key: THIRD_PARTY_PROVIDER_URL
         resources:
           limits:
             memory: "256Mi"

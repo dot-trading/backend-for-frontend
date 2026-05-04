@@ -13,4 +13,6 @@ public interface IPersistenceService
 
     Task<List<PortfolioSnapshotResponse>> GetPortfolioSnapshotsAsync(int limit = 50, int page = 1, CancellationToken ct = default);
     Task<PortfolioSnapshotResponse> CreatePortfolioSnapshotAsync(CreatePortfolioSnapshotRequest request, CancellationToken ct = default);
+
+    Task<PnlSummaryResponse> GetPnlSummaryAsync(string? quoteAsset = null, CancellationToken ct = default);
 }

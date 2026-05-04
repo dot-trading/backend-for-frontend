@@ -60,4 +60,11 @@ public class PersistenceService(HttpClient httpClient, IOptions<PersistenceOptio
         return await response.Content.ReadFromJsonAsync<PortfolioSnapshotResponse>(ct)
                ?? throw new InvalidOperationException("Failed to create portfolio snapshot");
     }
+
+    public async Task<PnlSummaryResponse> GetPnlSummaryAsync(string? quoteAsset = null, CancellationToken ct = default)
+    {
+        var url = $"{_base}/api/TradingData/pnl/summary";
+        if (quoteAsset is not null) url += $"?quoteAsset={quoteAsset}";
+        return await httpClient.GetFromJsonAsync<PnlSummaryResponse>(url, ct) ?? new();
+    }
 }
