@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
       - name: trading-bff-api
-        image: hsaii/trading-bff:latest
+        image: hsaii/trading-bff:v20260504-fix-v1
         imagePullPolicy: Always
         livenessProbe:
           httpGet:
