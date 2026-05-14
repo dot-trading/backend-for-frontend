@@ -1,10 +1,12 @@
+using System.Text.Json.Serialization;
+
 namespace Bff.Domain.Models.Persistence;
 
 public record TradeResponse(
     int Id, string Symbol, string Side, string Status,
-    double Price, double Quantity, double Value,
+    double Price, double Quantity, [property: JsonPropertyName("usdtValue")] double Value,
     double? StopLoss, double? TakeProfit, int? AiScore,
-    double? ClosePrice, double? Pnl, double? PnlPct,
+    double? ClosePrice, [property: JsonPropertyName("pnlUsdt")] double? Pnl, double? PnlPct,
     DateTime CreatedAt, DateTime? CloseAt);
 
 public record CreateTradeRequest(
