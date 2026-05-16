@@ -1,11 +1,12 @@
-using Bff.Domain.Abstractions;
 using Microsoft.AspNetCore.Mvc;
+using TradingProject.ThirdParty.Client.Models.Responses;
+using TradingProject.ThirdParty.Client.Services;
 
 namespace Bff.Web.Controllers;
 
 [ApiController]
 [Route("api/market-data")]
-public class MarketDataController(IThirdPartyService thirdParty) : ControllerBase
+public class MarketDataController(IThirdPartyApiClient thirdParty) : ControllerBase
 {
     [HttpGet("price/{symbol}")]
     public async Task<IActionResult> GetPrice(
@@ -31,20 +32,14 @@ public class MarketDataController(IThirdPartyService thirdParty) : ControllerBas
     public async Task<IActionResult> GetTicker24h(
         string symbol,
         CancellationToken cancellationToken = default)
-    {
-        var result = await thirdParty.GetTicker24hAsync(symbol, cancellationToken);
-        return result is null ? NotFound() : Ok(result);
-    }
+        => Ok(await thirdParty.GetTicker24hAsync(symbol, cancellationToken));
+
+    [HttpGet("tickers")]
+    public async Task<IActionResult> Get24hTickers(CancellationToken cancellationToken = default)
+        => Ok(await thirdParty.Get24hTickersAsync(cancellationToken));
 
     [HttpGet("sentiment/fear-and-greed")]
     public async Task<IActionResult> GetFearAndGreed(
         CancellationToken cancellationToken = default)
         => Ok(await thirdParty.GetFearAndGreedAsync(cancellationToken));
-
-    [HttpGet("price/coingecko/{coinId}")]
-    public async Task<IActionResult> GetCoinGeckoPrice(
-        string coinId,
-        [FromQuery] string vsCurrency = "usd",
-        CancellationToken cancellationToken = default)
-        => Ok(await thirdParty.GetCoinGeckoPriceAsync(coinId, vsCurrency, cancellationToken));
 }

@@ -1,11 +1,11 @@
-using Bff.Domain.Abstractions;
 using Microsoft.AspNetCore.Mvc;
+using TradingProject.ThirdParty.Client.Services;
 
 namespace Bff.Web.Controllers;
 
 [ApiController]
 [Route("api/account")]
-public class AccountController(IThirdPartyService thirdParty) : ControllerBase
+public class AccountController(IThirdPartyApiClient thirdParty) : ControllerBase
 {
     [HttpGet("balances")]
     public async Task<IActionResult> GetBalances(CancellationToken cancellationToken = default)

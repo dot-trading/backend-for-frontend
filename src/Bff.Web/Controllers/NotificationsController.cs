@@ -1,5 +1,6 @@
-using Bff.Domain.Abstractions;
 using Microsoft.AspNetCore.Mvc;
+using TradingProject.Persistence.Api.Stubs.V1;
+using TradingProject.ThirdParty.Client.Services;
 
 namespace Bff.Web.Controllers;
 
@@ -11,8 +12,8 @@ namespace Bff.Web.Controllers;
 [ApiController]
 [Route("api/notifications")]
 public class NotificationsController(
-    IPersistenceService persistence,
-    IThirdPartyService thirdParty) : ControllerBase
+    ITradesApi tradesApi,
+    IThirdPartyApiClient thirdParty) : ControllerBase
 {
     /// <summary>
     /// Retourne le contexte enrichi pour une alerte de stress de marché :
@@ -24,25 +25,35 @@ public class NotificationsController(
         CancellationToken ct = default)
     {
         // Appels parallèles pour minimiser la latence
-        var fearAndGreedTask  = thirdParty.GetFearAndGreedAsync(ct);
-        var tradesTask        = persistence.GetTradesAsync(limit: 200, page: 1, status: "open", ct: ct);
-        var pnlTask           = persistence.GetPnlSummaryAsync(quoteAsset, ct);
+        var fearAndGreedTask = thirdParty.GetFearAndGreedAsync(ct);
+        var tradesTask = tradesApi.GetTradesAsync(limit: 200, page: 1, status: "open", cancellationToken: ct);
 
-        await Task.WhenAll(fearAndGreedTask, tradesTask, pnlTask);
+        await Task.WhenAll(fearAndGreedTask, tradesTask);
 
         var fearAndGreed = await fearAndGreedTask;
-        var trades       = await tradesTask;
-        var pnl          = await pnlTask;
+        var paging = await tradesTask;
+        var trades = paging.Payload;
 
-        var result = new
+        // Calcul du PnL à partir des trades
+        double totalP = 0;
+        double dailyP = 0;
+        foreach (var t in trades)
         {
-            FearAndGreedIndex  = fearAndGreed.Value,
-            FearAndGreedLabel  = fearAndGreed.Classification,
-            OpenPositionsCount = trades.Count,
-            DailyPnl           = pnl.Today.Value,
-            TotalPnl           = pnl.Total.Value,
-        };
+            totalP += t.Pnl.GetValueOrDefault();
+            if (t.CloseAt.HasValue && t.CloseAt.Value.Date == DateTime.UtcNow.Date)
+                dailyP += t.Pnl.GetValueOrDefault();
+        }
 
-        return Ok(result);
+        int openCount = 0;
+        foreach (var _ in trades) openCount++;
+
+        return Ok(new
+        {
+            FearAndGreedIndex = fearAndGreed!.Value,
+            FearAndGreedLabel = fearAndGreed!.Classification,
+            OpenPositionsCount = openCount,
+            PnlDaily = dailyP,
+            PnlTotal = totalP,
+        });
     }
 }

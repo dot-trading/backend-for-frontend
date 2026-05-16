@@ -1,14 +1,8 @@
 <Solution>
   <Folder Name="/src/">
-    <Project Path="src/Bff.Application/Bff.Application.csproj" />
-    <Project Path="src/Bff.Domain/Bff.Domain.csproj" />
-    <Project Path="src/Bff.Infrastructure/Bff.Infrastructure.csproj" />
     <Project Path="src/Bff.Web/Bff.Web.csproj" />
   </Folder>
   <Folder Name="/tests/">
-    <Project Path="tests/Bff.Application.UnitTests/Bff.Application.UnitTests.csproj" />
-    <Project Path="tests/Bff.Domain.UnitTests/Bff.Domain.UnitTests.csproj" />
-    <Project Path="tests/Bff.Infrastructure.UnitTests/Bff.Infrastructure.UnitTests.csproj" />
     <Project Path="tests/Bff.Web.IntegrationTests/Bff.Web.IntegrationTests.csproj" />
   </Folder>
 </Solution>

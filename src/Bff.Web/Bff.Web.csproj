@@ -9,10 +9,8 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.7" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="10.1.7" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\Bff.Infrastructure\Bff.Infrastructure.csproj" />
+    <PackageReference Include="TradingProject.ThirdParty.Client" Version="1.0.5" />
+    <PackageReference Include="TradingProject.Persistence.Api.Stubs" Version="1.0.0" />
   </ItemGroup>
 
 </Project>
