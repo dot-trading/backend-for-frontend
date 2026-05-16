@@ -1,3 +1,4 @@
+using Bff.Web.Services;
 using TradingProject.Persistence.Api.Stubs.Stubs;
 using TradingProject.Persistence.Api.Stubs.V1;
 using TradingProject.ThirdParty.Client;
@@ -8,9 +9,12 @@ builder.Services.AddControllers();
 builder.Services.AddThirdPartyApiClient(builder.Configuration);
 
 // Register Persistence API stubs (in-memory implementations)
-builder.Services.AddSingleton<ITradesApi, TradesApiStub>();
-builder.Services.AddSingleton<IOpportunitiesApi, OpportunitiesApiStub>();
-builder.Services.AddSingleton<IPortfolioSnapshotsApi, PortfolioSnapshotsApiStub>();
+builder.Services.AddScoped<ITradesApi, TradesApiStub>();
+builder.Services.AddScoped<IOpportunitiesApi, OpportunitiesApiStub>();
+builder.Services.AddScoped<IPortfolioSnapshotsApi, PortfolioSnapshotsApiStub>();
+
+// Register the notification aggregation service
+builder.Services.AddScoped<INotificationAggregationService, NotificationAggregationService>();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddOpenApi();

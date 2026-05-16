@@ -1,59 +1,55 @@
 using Microsoft.AspNetCore.Mvc;
-using TradingProject.Persistence.Api.Stubs.V1;
-using TradingProject.ThirdParty.Client.Services;
+using TradingProject.Bff.Client.Models.Dtos;
+using Bff.Web.Services;
 
 namespace Bff.Web.Controllers;
 
 /// <summary>
-/// Fournit des données enrichies destinées aux notifications du telegram-bot.
-/// Agrège des informations provenant de plusieurs services (persistence, third-party)
-/// afin que l'orchestrateur reste léger (il n'envoie que les paramètres bruts).
+/// Provides enriched data for telegram-bot notifications.
+/// Aggregates information from Persistence and ThirdParty services
+/// so the orchestrator stays lightweight (it only sends raw parameters).
+///
+/// The telegram-bot is the sole consumer: it calls these endpoints to obtain
+/// typed DTOs and builds the final human-readable messages.
 /// </summary>
 [ApiController]
 [Route("api/notifications")]
 public class NotificationsController(
-    ITradesApi tradesApi,
-    IThirdPartyApiClient thirdParty) : ControllerBase
+    INotificationAggregationService aggregation) : ControllerBase
 {
     /// <summary>
-    /// Retourne le contexte enrichi pour une alerte de stress de marché :
-    /// Fear &amp; Greed, nombre de positions ouvertes, et P&amp;L du quoteAsset concerné.
+    /// Returns enriched context for a service-start notification.
+    /// Aggregates Fear &amp; Greed (ThirdParty) and open positions / P&amp;L (Persistence)
+    /// for the given quote asset.
     /// </summary>
-    [HttpGet("market-stress-context")]
-    public async Task<IActionResult> GetMarketStressContext(
+    /// <param name="quoteAsset">The quote asset (e.g. "USDC", "EUR").</param>
+    /// <param name="serviceName">The name of the started service.</param>
+    /// <param name="ct">Cancellation token.</param>
+    [HttpGet("service-start-context")]
+    public async Task<ActionResult<ServiceStartNotificationDto>> GetServiceStartContext(
         [FromQuery] string quoteAsset,
+        [FromQuery] string serviceName,
         CancellationToken ct = default)
     {
-        // Appels parallèles pour minimiser la latence
-        var fearAndGreedTask = thirdParty.GetFearAndGreedAsync(ct);
-        var tradesTask = tradesApi.GetTradesAsync(limit: 200, page: 1, status: "open", cancellationToken: ct);
+        var context = await aggregation.GetServiceStartContextAsync(quoteAsset, serviceName, ct);
+        return Ok(context);
+    }
 
-        await Task.WhenAll(fearAndGreedTask, tradesTask);
-
-        var fearAndGreed = await fearAndGreedTask;
-        var paging = await tradesTask;
-        var trades = paging.Payload;
-
-        // Calcul du PnL à partir des trades
-        double totalP = 0;
-        double dailyP = 0;
-        foreach (var t in trades)
-        {
-            totalP += t.Pnl.GetValueOrDefault();
-            if (t.CloseAt.HasValue && t.CloseAt.Value.Date == DateTime.UtcNow.Date)
-                dailyP += t.Pnl.GetValueOrDefault();
-        }
-
-        int openCount = 0;
-        foreach (var _ in trades) openCount++;
-
-        return Ok(new
-        {
-            FearAndGreedIndex = fearAndGreed!.Value,
-            FearAndGreedLabel = fearAndGreed!.Classification,
-            OpenPositionsCount = openCount,
-            PnlDaily = dailyP,
-            PnlTotal = totalP,
-        });
+    /// <summary>
+    /// Returns enriched context for a market-stress alert.
+    /// Aggregates Fear &amp; Greed (ThirdParty) and open positions / P&amp;L (Persistence)
+    /// for the given quote asset.
+    /// </summary>
+    /// <param name="quoteAsset">The quote asset (e.g. "USDC", "EUR").</param>
+    /// <param name="stressValue">The stress level reported by the orchestrator.</param>
+    /// <param name="ct">Cancellation token.</param>
+    [HttpGet("market-stress-context")]
+    public async Task<ActionResult<MarketStressNotificationDto>> GetMarketStressContext(
+        [FromQuery] string quoteAsset,
+        [FromQuery] int stressValue = 0,
+        CancellationToken ct = default)
+    {
+        var context = await aggregation.GetMarketStressContextAsync(quoteAsset, stressValue, ct);
+        return Ok(context);
     }
 }

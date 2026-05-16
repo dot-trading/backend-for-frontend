@@ -1,8 +1,10 @@
 <Solution>
   <Folder Name="/src/">
     <Project Path="src/Bff.Web/Bff.Web.csproj" />
+    <Project Path="src/TradingProject.Bff.Client/TradingProject.Bff.Client.csproj" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/Bff.Web.IntegrationTests/Bff.Web.IntegrationTests.csproj" />
+    <Project Path="tests/Bff.Web.UnitTests/Bff.Web.UnitTests.csproj" />
   </Folder>
 </Solution>

@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net8.0;net9.0;net10.0</TargetFrameworks>
+    <TargetFramework Condition="'$(TargetFrameworks)' != ''"></TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+
+    <!-- NuGet package metadata -->
+    <PackageId>TradingProject.Bff.Client</PackageId>
+    <Version>1.0.0</Version>
+    <Authors>TradingProject</Authors>
+    <Description>Client library for the BFF (Backend For Frontend) API. Provides typed services, DTOs and notification aggregation contracts consumed by telegram-bot.</Description>
+    <PackageTags>bff;notifications;trading;api-client</PackageTags>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <RepositoryUrl>https://github.com/trading-project/backend-for-frontend</RepositoryUrl>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.6" />
+    <PackageReference Include="Microsoft.Extensions.Http" Version="10.0.6" />
+    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="10.0.6" />
+    <PackageReference Include="Microsoft.Extensions.Options.DataAnnotations" Version="10.0.6" />
+  </ItemGroup>
+
+</Project>

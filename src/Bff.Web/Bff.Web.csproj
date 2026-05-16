@@ -13,4 +13,8 @@
     <PackageReference Include="TradingProject.Persistence.Api.Stubs" Version="1.0.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\TradingProject.Bff.Client\TradingProject.Bff.Client.csproj" />
+  </ItemGroup>
+
 </Project>
