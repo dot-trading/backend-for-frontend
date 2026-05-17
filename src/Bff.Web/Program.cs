@@ -2,8 +2,14 @@ using Bff.Web.Services;
 using TradingProject.Persistence.Api.Stubs.Stubs;
 using TradingProject.Persistence.Api.Stubs.V1;
 using TradingProject.ThirdParty.Client;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Host.UseSerilog((context, services, configuration) => configuration
+    .ReadFrom.Configuration(context.Configuration)
+    .ReadFrom.Services(services)
+    .Enrich.FromLogContext());
 
 builder.Services.AddControllers();
 builder.Services.AddThirdPartyApiClient(builder.Configuration);

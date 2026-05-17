@@ -11,6 +11,8 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="10.1.7" />
     <PackageReference Include="TradingProject.ThirdParty.Client" Version="1.0.5" />
     <PackageReference Include="TradingProject.Persistence.Api.Stubs" Version="1.0.0" />
+    <PackageReference Include="Serilog.AspNetCore" Version="9.0.0" />
+    <PackageReference Include="Serilog.Sinks.Elasticsearch" Version="10.0.0" />
   </ItemGroup>
 
   <ItemGroup>
