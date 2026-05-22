@@ -15,9 +15,9 @@ builder.Services.AddControllers();
 builder.Services.AddThirdPartyApiClient(builder.Configuration);
 
 // Register Persistence API stubs (in-memory implementations)
-builder.Services.AddScoped<ITradesApi, TradesApiStub>();
-builder.Services.AddScoped<IOpportunitiesApi, OpportunitiesApiStub>();
-builder.Services.AddScoped<IPortfolioSnapshotsApi, PortfolioSnapshotsApiStub>();
+builder.Services.AddSingleton<ITradesApi, TradesApiStub>();
+builder.Services.AddSingleton<IOpportunitiesApi, OpportunitiesApiStub>();
+builder.Services.AddSingleton<IPortfolioSnapshotsApi, PortfolioSnapshotsApiStub>();
 
 // Register the notification aggregation service
 builder.Services.AddScoped<INotificationAggregationService, NotificationAggregationService>();

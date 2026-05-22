@@ -14,19 +14,42 @@ public class PnlController(ITradesApi tradesApi) : ControllerBase
         var paging = await tradesApi.GetTradesAsync(limit: 500, page: 1, cancellationToken: ct);
         var trades = paging.Payload;
 
+        var today = DateTime.UtcNow.Date;
+        int diff = (7 + (today.DayOfWeek - DayOfWeek.Monday)) % 7;
+        var startOfWeek = today.AddDays(-diff);
+        var startOfMonth = new DateTime(today.Year, today.Month, 1);
+
         double totalPnl = 0;
         double dailyPnl = 0;
+        double weeklyPnl = 0;
+        double monthlyPnl = 0;
+
         foreach (var t in trades)
         {
-            totalPnl += t.Pnl.GetValueOrDefault();
-            if (t.CloseAt.HasValue && t.CloseAt.Value.Date == DateTime.UtcNow.Date)
-                dailyPnl += t.Pnl.GetValueOrDefault();
+            if (!string.IsNullOrEmpty(quoteAsset) && !string.Equals(t.QuoteAsset, quoteAsset, StringComparison.OrdinalIgnoreCase))
+                continue;
+
+            var pnl = t.Pnl.GetValueOrDefault();
+            totalPnl += pnl;
+
+            if (t.CloseAt.HasValue)
+            {
+                var closeDate = t.CloseAt.Value.Date;
+                if (closeDate == today)
+                    dailyPnl += pnl;
+                if (closeDate >= startOfWeek)
+                    weeklyPnl += pnl;
+                if (closeDate >= startOfMonth)
+                    monthlyPnl += pnl;
+            }
         }
 
         return Ok(new
         {
             Today = new { Value = dailyPnl },
-            Total = new { Value = totalPnl },
+            ThisWeek = new { Value = weeklyPnl },
+            ThisMonth = new { Value = monthlyPnl },
+            Total = new { Value = totalPnl }
         });
     }
 }
