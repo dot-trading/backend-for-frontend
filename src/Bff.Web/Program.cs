@@ -14,10 +14,19 @@ builder.Host.UseSerilog((context, services, configuration) => configuration
 builder.Services.AddControllers();
 builder.Services.AddThirdPartyApiClient(builder.Configuration);
 
-// Register Persistence API stubs (in-memory implementations)
-builder.Services.AddSingleton<ITradesApi, TradesApiStub>();
-builder.Services.AddSingleton<IOpportunitiesApi, OpportunitiesApiStub>();
-builder.Services.AddSingleton<IPortfolioSnapshotsApi, PortfolioSnapshotsApiStub>();
+// Register real Persistence API HTTP clients
+builder.Services.AddHttpClient<ITradesApi, Bff.Web.Clients.TradesHttpClient>(client =>
+{
+    client.BaseAddress = new Uri("http://trading-persistence-api/");
+});
+builder.Services.AddHttpClient<IOpportunitiesApi, Bff.Web.Clients.OpportunitiesHttpClient>(client =>
+{
+    client.BaseAddress = new Uri("http://trading-persistence-api/");
+});
+builder.Services.AddHttpClient<IPortfolioSnapshotsApi, Bff.Web.Clients.PortfolioSnapshotsHttpClient>(client =>
+{
+    client.BaseAddress = new Uri("http://trading-persistence-api/");
+});
 
 // Register the notification aggregation service
 builder.Services.AddScoped<INotificationAggregationService, NotificationAggregationService>();
