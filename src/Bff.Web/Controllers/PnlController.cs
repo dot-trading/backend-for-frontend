@@ -11,7 +11,7 @@ public class PnlController(ITradesApi tradesApi) : ControllerBase
     [HttpGet("summary")]
     public async Task<IActionResult> GetSummary([FromQuery] string? quoteAsset, CancellationToken ct)
     {
-        var paging = await tradesApi.GetTradesAsync(limit: 500, page: 1, cancellationToken: ct);
+        var paging = await tradesApi.GetTradesAsync(limit: 10000, status: "closed", page: 1, cancellationToken: ct);
         var trades = paging.Payload;
 
         var today = DateTime.UtcNow.Date;
